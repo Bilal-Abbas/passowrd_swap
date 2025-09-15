@@ -1,8 +1,8 @@
 # terraform-password-manager
 
-Simple Terraform module for managing active/backup password pairs. Handles password generation, rotation, and swapping with proper idempotency.
+Terraform module for managing active/backup password pairs with rotation and swapping.
 
-## Quick Start
+## Quick start
 
 ```hcl
 module "passwords" {
@@ -15,7 +15,7 @@ module "passwords" {
 
 ## What it does
 
-This module generates two random passwords (active and backup) and lets you:
+Generates two random passwords (active and backup) and lets you:
 - Rotate the backup password without touching the active one
 - Swap active and backup passwords
 - Regenerate the active password
@@ -67,7 +67,7 @@ module "passwords" {
 }
 ```
 
-## Configuration
+## Variables
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
@@ -84,58 +84,45 @@ module "passwords" {
 
 - `active_password` - The active password
 - `backup_password` - The backup password
-- `metadata` - Some info about the passwords
+- `info` - Some info about the passwords
 
 ## Requirements
 
 - Terraform >= 1.0
 - Random provider ~> 3.1
 
-## How to Run
+## How to run
 
-### Quick Test
+### Quick test
 
 ```bash
-# Create test directory
-mkdir test && cd test
-
-# Create main.tf with this content:
-cat > main.tf << 'EOF'
-module "passwords" {
-  source = "../"
-  password_length = 16
-  operation_mode = "regenerate_active"
-}
-
-output "passwords" {
-  value = {
-    active = module.passwords.active_password
-    backup = module.passwords.backup_password
-  }
-  sensitive = true
-}
-EOF
-
-# Run it
+cd examples
 terraform init
 terraform apply -auto-approve
 terraform output -json passwords
 ```
 
-### Test Different Operations
+### Complete example
+
+Shows all operations: generation, rotation, and swapping.
 
 ```bash
-# Test password swapping
-cat > swap_test.tf << 'EOF'
-module "swapped" {
-  source = "../"
-  operation_mode = "swap"
-  current_active_password = "old_active"
-  current_backup_password = "old_backup"
-}
-EOF
-
+cd examples
+terraform init
 terraform apply -auto-approve
+terraform output -json initial_passwords
+terraform output -json swapped_passwords
+```
+
+### Use in your project
+
+```bash
+# In your project directory
+module "passwords" {
+  source = "path/to/this/module"
+  password_length = 16
+  operation_mode = "regenerate_active"
+}
 ```
 
 ## Notes

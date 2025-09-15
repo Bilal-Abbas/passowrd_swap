@@ -1,6 +1,6 @@
 variable "password_length" {
-  type        = number
-  default     = 16
+  type    = number
+  default = 16
   validation {
     condition     = var.password_length >= 8 && var.password_length <= 128
     error_message = "Password length must be between 8 and 128 characters."
