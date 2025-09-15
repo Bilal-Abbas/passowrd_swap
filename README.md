@@ -91,16 +91,51 @@ module "passwords" {
 - Terraform >= 1.0
 - Random provider ~> 3.1
 
-## Testing
+## How to Run
 
-Create a test directory and run:
+### Quick Test
 
 ```bash
+# Create test directory
 mkdir test && cd test
-# Copy the examples above into main.tf
+
+# Create main.tf with this content:
+cat > main.tf << 'EOF'
+module "passwords" {
+  source = "../"
+  password_length = 16
+  operation_mode = "regenerate_active"
+}
+
+output "passwords" {
+  value = {
+    active = module.passwords.active_password
+    backup = module.passwords.backup_password
+  }
+  sensitive = true
+}
+EOF
+
+# Run it
 terraform init
-terraform apply
-terraform output passwords
+terraform apply -auto-approve
+terraform output -json passwords
+```
+
+### Test Different Operations
+
+```bash
+# Test password swapping
+cat > swap_test.tf << 'EOF'
+module "swapped" {
+  source = "../"
+  operation_mode = "swap"
+  current_active_password = "old_active"
+  current_backup_password = "old_backup"
+}
+EOF
+
+terraform apply -auto-approve
 ```
 
 ## Notes
